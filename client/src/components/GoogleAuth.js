@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { signIn, signOut } from '../actions/index'
 
 class GoogleAuth extends Component {
-  state = { isSignedIn: null }
+  //state = { isSignedIn: null }
+
   componentDidMount() {
     window.gapi.load('client:auth2', () => {
       window.gapi.client
@@ -12,14 +15,25 @@ class GoogleAuth extends Component {
         })
         .then(() => {
           this.auth = window.gapi.auth2.getAuthInstance() //this.auth will give reference to the instance that we can use to sign in or sign out a user or get users current authentication status
-          this.setState({ isSignedIn: this.auth.isSignedIn.get() })
-          this.auth.isSignedIn.listen(this.onAuthChange)
+
+          //this.setState({ isSignedIn: this.auth.isSignedIn.get() })
+
+          this.onAuthChange(this.auth.isSignedIn.get()) //update the auth state in redux store
+          this.auth.isSignedIn.listen(this.onAuthChange) //wait for the authentication status to change
         })
     })
   }
 
-  onAuthChange = () => {
-    this.setState({ isSignedIn: this.auth.isSignedIn.get() })
+  // onAuthChange = () => {
+  //   this.setState({ isSignedIn: this.auth.isSignedIn.get() })
+  // }
+
+  onAuthChange = (isSignedIn) => {
+    if (isSignedIn) {
+      this.props.signIn()
+    } else {
+      this.props.signOut()
+    }
   }
 
   onSignIn = () => {
@@ -31,9 +45,9 @@ class GoogleAuth extends Component {
   }
 
   renderAuthButton() {
-    if (this.state.isSignedIn === null) {
+    if (this.props.isSignedIn === null) {
       return null
-    } else if (this.state.isSignedIn) {
+    } else if (this.props.isSignedIn) {
       return (
         <button className='ui red google button' onClick={this.onSignOut}>
           <i className='google icon' />
@@ -55,4 +69,10 @@ class GoogleAuth extends Component {
   }
 }
 
-export default GoogleAuth
+const mapStateToProps = (state) => {
+  return {
+    isSignedIn: state.auth.isSignedIn,
+  }
+}
+
+export default connect(mapStateToProps, { signIn, signOut })(GoogleAuth)
