@@ -9,16 +9,27 @@ class StreamCreate extends React.Component {
       //   value={formProps.input.value}
       // />
 
-      <input {...formProps.input} /> // {...formProps.input} this will take all key value pairs like, onChange, input etc. and add them properties to the input element
+      // {...formProps.input} this will take all key value pairs like, onChange, input etc. and add them properties to the input element
+      <div className='field'>
+        <label>{formProps.label}</label>
+        <input {...formProps.input} />
+      </div>
     )
   }
   render() {
-    console.log(this.props)
     return (
       <div>
-        <form>
-          <Field name='title' component={this.renderInput} />
-          <Field name='description' component={this.renderInput} />
+        <form className='ui form'>
+          <Field
+            name='title'
+            component={this.renderInput}
+            label='Enter Title'
+          />
+          <Field
+            name='description'
+            component={this.renderInput}
+            label='Enter Description'
+          />
         </form>
       </div>
     )
